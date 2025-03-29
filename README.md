@@ -133,3 +133,93 @@ Final Summary
 ✅ Dependency Guard Android project ke dependencies track karne aur unexpected dependency changes detect karne ke liye use hota hai.
 ✅ GitHub Actions ke saath integrate karke, tum ensure kar sakti ho ki koi bhi dependency bina track kiye update na ho.
 ✅ Agar koi dependency change hoti hai, to ya to build fail ho jayega ya PR ke andar baseline auto-update ho jayega. 🚀
+
+
+
+
+
+
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+📸 Run Screenshot Tests using Roborazzi in Android
+🎯 ./gradlew verifyRoborazziDebug Kya Karta Hai?
+Yeh Roborazzi ka ek command hai jo screenshot-based testing ke liye use hota hai.
+Iska kaam app ke UI screenshots capture karna aur unko expected output ke sath compare karna hota hai.
+
+🔥 Roborazzi Setup Android Project Me Kaise Karein?
+Step 1️⃣: Dependencies Add Karo
+build.gradle (Module: app) me dependencies add karo:
+
+gradle
+Copy
+Edit
+dependencies {
+    androidTestImplementation "io.github.takahirom.roborazzi:roborazzi:1.6.1"
+}
+Step 2️⃣: Gradle Plugin Enable Karo
+gradle.properties me roborazzi enable karna hoga:
+
+properties
+Copy
+Edit
+android.experimental.testOptions.roborazzi=true
+Step 3️⃣: Screenshot Test Likho
+Android Instrumented Test likhna hoga jo screenshots capture karega.
+
+kotlin
+Copy
+Edit
+@RunWith(AndroidJUnit4::class)
+class ScreenshotTest {
+    @get:Rule
+    val composeTestRule = createAndroidComposeRule<MainActivity>()
+
+    @Test
+    fun captureHomeScreen() {
+        composeTestRule.onRoot().captureRoboImage()
+    }
+}
+Ye test Home Screen ka screenshot lega aur compare karega.
+
+⚙️ GitHub Actions Me Roborazzi Setup Kaise Karein?
+Agar tum GitHub Actions me automate karna chahte ho, to ye workflow file add karo:
+
+yaml
+Copy
+Edit
+name: Run Screenshot Tests
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  screenshotTest:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Set up Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Install Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Run Roborazzi Screenshot Tests
+        run: ./gradlew verifyRoborazziDebug
+💡 Roborazzi Ka Best Use Case Kya Hai?
+✅ UI Regression Testing → UI changes track karne ke liye
+✅ Dark Mode / Light Mode Test → Dono themes ke screenshots compare karna
+✅ Different Screen Sizes Test → UI responsiveness check karna
+✅ Animations & Transitions Debugging
+
+🚀 Conclusion
+🔹 Roborazzi screenshot testing ke liye use hota hai.
+🔹 verifyRoborazziDebug UI screenshots capture karke compare karta hai.
+🔹 GitHub Actions me automation ke liye MacOS aur Android SDK setup karna padta hai.
+🔹 Yeh visual regression testing ke liye best hai! 🚀
