@@ -223,3 +223,134 @@ jobs:
 🔹 verifyRoborazziDebug UI screenshots capture karke compare karta hai.
 🔹 GitHub Actions me automation ke liye MacOS aur Android SDK setup karna padta hai.
 🔹 Yeh visual regression testing ke liye best hai! 🚀
+
+
+
+
+
+
+
+
+
+
+
+
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------
+🚀 Automated Screenshot Testing using GitHub Actions
+Agar tum chaahte ho ki har pull request (PR) ya commit pe automatically screenshot test ho jaye, to GitHub Actions ka use kar sakte ho.
+Isme tests run honge, screenshots generate honge, aur changes verify honge.
+
+✅ 1️⃣ Process Overview
+🔹 Step 1: GitHub Actions setup karein (.github/workflows/screenshot-tests.yml)
+🔹 Step 2: Emulator start karein aur tests run karein
+🔹 Step 3: Screenshots ko verify karein aur GitHub pe upload karein
+🔹 Step 4: Agar screenshot change ho gaye, to PR fail ho jaye
+
+🛠 2️⃣ Setup GitHub Actions Workflow
+👉 GitHub me ek naye workflow file banao:
+📌 Path: .github/workflows/screenshot-tests.yml
+
+yaml
+Copy
+Edit
+name: 📸 Screenshot Testing
+
+on:
+  pull_request:
+    branches:
+      - main  # Jab bhi PR aayega "main" branch pe, yeh test run hoga
+
+jobs:
+  screenshot-tests:
+    runs-on: macos-latest  # Android emulator ke liye MacOS chahiye
+
+    steps:
+      - name: 📥 Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: 📦 Setup JDK & Gradle
+        uses: actions/setup-java@v8
+        with:
+          distribution: 'temurin'
+          java-version: '17'  # Android latest versions ke liye Java 17 best hai
+
+      - name: 🏗 Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: 📱 Start Android Emulator
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 30
+          arch: x86_64
+          script: ./gradlew connectedDebugAndroidTest  # Emulator par test run karega
+
+      - name: 📸 Run Screenshot Tests (Roborazzi)
+        run: ./gradlew verifyRoborazziDebug
+
+      - name: 📝 Upload Screenshots as Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: screenshots
+          path: app/build/outputs/roborazzi  # Yahan screenshots save hote hain
+🧐 3️⃣ Yeh Workflow Kya Kar Raha Hai?
+Step	Kaam
+📥 Checkout Repository	GitHub Actions me repo download hota hai
+📦 Setup JDK & Gradle	Java aur Gradle ko setup karta hai
+🏗 Setup Android SDK	Android SDK setup hota hai
+📱 Start Android Emulator	Emulator ko start karta hai
+📸 Run Screenshot Tests	./gradlew verifyRoborazziDebug se screenshots verify hote hain
+📝 Upload Screenshots	Artifacts ke through screenshots GitHub pe upload hote hain
+🚀 4️⃣ Verify Changes in Screenshots
+Agar koi screenshot change hota hai, to PR me "checks failed" dikhayega.
+Iska matlab: ✅ Agar UI same hai, to PR pass hoga.
+❌ Agar UI change ho gayi, to PR fail hoga aur review karna padega.
+
+⚡ 5️⃣ Screenshot Diffing (Changes Track Karna)
+Agar tum screenshot changes track karna chahte ho, to GitHub pe screenshots upload hone ke baad compare kar sakte ho.
+
+🔹 Yeh command use karke local system me changes compare karo:
+
+sh
+Copy
+Edit
+./gradlew recordRoborazziDebug
+🔹 Fir naye screenshots ko GitHub pe commit karo:
+
+sh
+Copy
+Edit
+git add app/src/main/roborazzi
+git commit -m "Updated screenshots"
+git push origin <branch-name>
+🔄 6️⃣ Agar Changes Accept Karne Hain
+Agar tumhe screenshots update karne hain, to: 1️⃣ Local system me screenshots regenerate karo:
+
+sh
+Copy
+Edit
+./gradlew recordRoborazziDebug
+2️⃣ Changes commit karke PR me push karo:
+
+sh
+Copy
+Edit
+git add app/src/main/roborazzi
+git commit -m "Updated UI screenshots"
+git push origin <branch-name>
+🔥 Final Summary
+1️⃣ GitHub Actions ko setup karo (screenshot-tests.yml)
+2️⃣ Har PR pe screenshots generate aur verify honge
+3️⃣ Agar UI change hoti hai, to PR fail ho jayega
+4️⃣ Agar naye screenshots sahi hain, to manually accept karke commit karo
+
+🎯 Ab tumhare app me har UI change automatic verify ho jayega! 🚀
+
+
+
+
+
+
+
+
+
